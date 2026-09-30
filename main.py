@@ -320,7 +320,11 @@ class DebouncePlugin(Star):
         if msg_id in self.should_cancel_msg_ids:
             self.should_cancel_msg_ids.remove(msg_id)
             if not message_text:
-                event.stop_event()
+                # 无文本消息（纯文件/语音/视频等）不参与合并，只能放行。
+                # 不能 stop_event()：buffer 与重放路径同样会跳过空文本
+                # （_monitor_session 里的 `if not full_text`），终止就等于把这条
+                # 消息连同已下载的文件一起静默丢弃 —— 发送方和助手两侧都无痕。
+                # 与下方正常路径的 `if not message_text: return` 保持一致。
                 return
             # 将消息加入buffer，确保它能与后续消息合并
             buffer = self._get_buffer(session_id)

@@ -1,5 +1,24 @@
 # AstrBot 消息防抖插件
 
+> ## ⚠️ 这是 fork
+>
+> 上游：[advent259141/astrbot_plugin_debounce](https://github.com/advent259141/astrbot_plugin_debounce)
+> · 本 fork：[cyberElar/astrbot_plugin_debounce](https://github.com/cyberElar/astrbot_plugin_debounce)
+>
+> **改动（2026-09-30）：修复取消分支吞掉无文本媒体消息的问题。**
+> 一条纯文件 / 语音 / 视频消息（`message_str` 为空）若在「等待会话锁」期间遇到
+> 用户再发一条消息，会被 `on_llm_request` 的取消分支 `event.stop_event()` 静默
+> 丢弃 —— 它既进不了 buffer（无文本可合并），也不会被重放
+> （`_monitor_session` 同样跳过空文本），文件即使已经完整下载也送不到助手，
+> 且收发两侧都无痕。
+>
+> 改动位置：`main.py` 中 `should_cancel_msg_ids` 分支内，`event.stop_event()`
+> 改为直接 `return`（放行），与同函数下方正常路径的 `if not message_text: return`
+> 保持一致。版本 1.1.1 → 1.1.2。
+>
+> 除此之外与上游 `master`（commit `6a6d58f`）一致。本 fork 依 AGPL-3.0 发布，
+> 许可证与上游相同（见 `LICENSE`）。
+
 > ⚠️ **注意：本插件仅支持 AstrBot 4.11+ 版本使用**
 > 
 <div align="center">
